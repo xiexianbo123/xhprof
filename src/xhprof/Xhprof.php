@@ -48,6 +48,7 @@ class Xhprof
 
         echo "<head><title>XHProf: Hierarchical Profiler Report</title>";
         $ui_dir_url_path = '/xhprof/src/xhprof/xhprof_html';
+//        $ui_dir_url_path = '/xhprof/xhprof_html';
         xhprof_include_js_css($ui_dir_url_path);
         echo "</head>";
 
