@@ -191,14 +191,23 @@ $(document).ready(function() {
       },
       showURL : false
     });
-  var cur_params = {} ;
+  var cur_params = {};
   $.each(location.search.replace('?','').split('&'), function(i, x) {
     var y = x.split('='); cur_params[y[0]] = y[1];
   });
+
+  /*
   $('input.function_typeahead')
     .autocomplete('typeahead.php', { extraParams : cur_params })
     .result(function(event, item) {
       cur_params['symbol'] = item;
       location.search = '?' + jQuery.param(cur_params);
     });
+   */
+
+  $("#funcSub").click(function(){
+    cur_params['symbol'] = $("input.function_typeahead").val();
+    location.search = '?' + jQuery.param(cur_params);
+  });
+
 });

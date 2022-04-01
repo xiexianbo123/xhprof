@@ -537,8 +537,9 @@ function profiler_report ($url_params,
   }
 
   // lookup function typeahead form
-  $links [] = '<input class="function_typeahead" ' .
-              ' type="input" size="40" maxlength="100" />';
+//  $links [] = '<input class="function_typeahead" '.' type="input" size="40" maxlength="100" />';
+  $links [] = '<input class="function_typeahead" '.' type="input" size="40" maxlength="100" />'
+      .' <button type="button" id="funcSub">提交</button>';
 
   echo xhprof_render_actions($links);
 
