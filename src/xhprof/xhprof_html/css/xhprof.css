@@ -80,3 +80,9 @@ ul.xhprof_actions li a:hover {
   color:#FFFFFF;
 }
 
+/**** xxb 列表样式 ****/
+.small_filemtime{width:150px;display: inline-block;}
+.small_wt{width:80px;display: inline-block;}
+.small_log{width:140px;display: inline-block;}
+.small_method{width:60px;display: inline-block;text-align: center}
+.red{color:red;font-weight: bold;}

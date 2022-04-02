@@ -944,3 +944,45 @@ function xhprof_get_matching_functions($q, $xhprof_data) {
   return ($res);
 }
 
+/**
+ * 创建redis
+ */
+function create_redis(){
+    static $redis = null;
+    if(is_null($redis)){
+        try {
+            $redis = new Redis();
+            $redis->connect(X_REDIS_HOST, X_REDIS_PORT);
+            if (X_REDIS_PWD) $redis->auth(X_REDIS_PWD);
+            $redis->select(X_REDIS_DB);
+        }catch (\Exception $e){
+            trigger_error('无法连接redis服务端，请检查「redis配置」!', E_USER_ERROR);
+        }
+    }
+
+    return $redis;
+}
+
+/**
+ * 过滤某些请求
+ */
+function isIgnore(){
+    $ignoreArr = X_IGNORE_URL_ARR;
+    if(!is_array($ignoreArr))
+        return true;
+
+    //当前请求url
+    $request_uri = $_SERVER['REQUEST_URI'];
+    if(empty($request_uri)) return false;
+
+    $request_uri = strtolower($request_uri);
+
+    //是否需要忽略当前url
+    foreach ($ignoreArr as $value) {
+        $res = strpos($request_uri, strtolower($value));
+        //是否存在
+        if($res!==false && $res>=0) return false;
+    }
+
+    return true;
+}

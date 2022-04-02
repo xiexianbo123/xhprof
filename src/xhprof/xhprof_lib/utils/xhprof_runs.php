@@ -29,30 +29,31 @@
  *
  * @author Kannan
  */
-interface iXHProfRuns {
+interface iXHProfRuns
+{
 
-  /**
-   * Returns XHProf data given a run id ($run) of a given
-   * type ($type).
-   *
-   * Also, a brief description of the run is returned via the
-   * $run_desc out parameter.
-   */
-  public function get_run($run_id, $type, &$run_desc);
+    /**
+     * Returns XHProf data given a run id ($run) of a given
+     * type ($type).
+     *
+     * Also, a brief description of the run is returned via the
+     * $run_desc out parameter.
+     */
+    public function get_run($run_id, $type, &$run_desc);
 
-  /**
-   * Save XHProf data for a profiler run of specified type
-   * ($type).
-   *
-   * The caller may optionally pass in run_id (which they
-   * promise to be unique). If a run_id is not passed in,
-   * the implementation of this method must generated a
-   * unique run id for this saved XHProf run.
-   *
-   * Returns the run id for the saved XHProf run.
-   *
-   */
-  public function save_run($xhprof_data, $type, $run_id = null);
+    /**
+     * Save XHProf data for a profiler run of specified type
+     * ($type).
+     *
+     * The caller may optionally pass in run_id (which they
+     * promise to be unique). If a run_id is not passed in,
+     * the implementation of this method must generated a
+     * unique run id for this saved XHProf run.
+     *
+     * Returns the run id for the saved XHProf run.
+     *
+     */
+    public function save_run($xhprof_data, $type, $run_id = null);
 }
 
 
@@ -65,103 +66,158 @@ interface iXHProfRuns {
  *
  * @author Kannan
  */
-class XHProfRuns_Default implements iXHProfRuns {
+class XHProfRuns_Default implements iXHProfRuns
+{
 
-  private $dir = '';
-  private $suffix = 'xhprof';
+    private $dir = '';
+    private $suffix = 'xhprof';
 
-  private function gen_run_id($type) {
-    return uniqid();
-  }
-
-  private function file_name($run_id, $type) {
-
-    $file = "$run_id.$type." . $this->suffix;
-
-    if (!empty($this->dir)) {
-      $file = $this->dir . "/" . $file;
-    }
-    return $file;
-  }
-
-  public function __construct($dir = null) {
-    // if user hasn't passed a directory location,
-    // we use the xhprof.output_dir ini setting
-    // if specified, else we default to the directory
-    // in which the error_log file resides.
-
-    if (empty($dir)) {
-      $dir = ini_get("xhprof.output_dir");
-      if (empty($dir)) {
-
-        // some default that at least works on unix...
-        $dir = "/tmp";
-
-        xhprof_error("Warning: Must specify directory location for XHProf runs. ".
-                     "Trying {$dir} as default. You can either pass the " .
-                     "directory location as an argument to the constructor ".
-                     "for XHProfRuns_Default() or set xhprof.output_dir ".
-                     "ini param.");
-      }
-    }
-    $this->dir = $dir;
-  }
-
-  public function get_run($run_id, $type, &$run_desc) {
-    $file_name = $this->file_name($run_id, $type);
-
-    if (!file_exists($file_name)) {
-      xhprof_error("Could not find file $file_name");
-      $run_desc = "Invalid Run Id = $run_id";
-      return null;
+    private function gen_run_id($type)
+    {
+        return uniqid();
     }
 
-    $contents = file_get_contents($file_name);
-    $run_desc = "XHProf Run (Namespace=$type)";
-    return unserialize($contents);
-  }
+    private function file_name($run_id, $type)
+    {
 
-  public function save_run($xhprof_data, $type, $run_id = null) {
+        $file = "$run_id.$type." . $this->suffix;
 
-    // Use PHP serialize function to store the XHProf's
-    // raw profiler data.
-    $xhprof_data = serialize($xhprof_data);
-
-    if ($run_id === null) {
-      $run_id = $this->gen_run_id($type);
+        if (!empty($this->dir)) {
+            $file = $this->dir . "/" . $file;
+        }
+        return $file;
     }
 
-    $file_name = $this->file_name($run_id, $type);
-    $file = fopen($file_name, 'w');
+    public function __construct($dir = null)
+    {
+        // if user hasn't passed a directory location,
+        // we use the xhprof.output_dir ini setting
+        // if specified, else we default to the directory
+        // in which the error_log file resides.
 
-    if ($file) {
-      fwrite($file, $xhprof_data);
-      fclose($file);
-    } else {
-      xhprof_error("Could not open $file_name\n");
+        if (empty($dir)) {
+            $dir = ini_get("xhprof.output_dir");
+            if (empty($dir)) {
+
+                // some default that at least works on unix...
+                $dir = "/tmp";
+
+                xhprof_error("Warning: Must specify directory location for XHProf runs. " .
+                    "Trying {$dir} as default. You can either pass the " .
+                    "directory location as an argument to the constructor " .
+                    "for XHProfRuns_Default() or set xhprof.output_dir " .
+                    "ini param.");
+            }
+        }
+        $this->dir = $dir;
     }
 
-    // echo "Saved run in {$file_name}.\nRun id = {$run_id}.\n";
-    return $run_id;
-  }
+    public function get_run($run_id, $type, &$run_desc){
+        $run_desc = "XHProf Run (Namespace=$type)";
 
-  function list_runs() {
-    if (is_dir($this->dir)) {
+        $redis = create_redis();
+        $res = $redis->get(X_KEY_PREFIX.':xhprof_log:'.$run_id);
+        return unserialize($res);
+    }
+
+    //实现接口方法
+    public function save_run($xhprof_data, $type, $run_id = null)
+    {
+        //根据响应时间判断是否需要记录
+        if (X_TIME_LIMIT > 0 && $xhprof_data['main()']['wt'] < (X_TIME_LIMIT * 1000 * 1000)) return false;
+
+        //根据忽略配置判断是否忽略当前请求
+        if (!isIgnore()) return false;
+
+        //控制日志长度
+        $this->_checkLogNum();
+
+        //数据存储至redis
+        $run_id = $this->_saveToRedis($xhprof_data);
+        return $run_id;
+    }
+
+
+    /**
+     * 控制日志长度
+     * @return bool
+     */
+    protected function _checkLogNum()
+    {
+        $redis = create_redis();
+        $num = $redis->incr(X_KEY_PREFIX . ":run_id_num");
+        if ($num > X_LOG_NUM) {
+            $old_run_id = $redis->rpop(X_KEY_PREFIX . ':run_id');
+            $redis->delete(X_KEY_PREFIX . ':request_log:' . $old_run_id);
+            $redis->delete(X_KEY_PREFIX . ':xhprof_log:' . $old_run_id);
+            $redis->decr(X_KEY_PREFIX . ':run_id_num');  //计数-1
+        }
+        return true;
+    }
+
+    /**
+     * 数据存储至redis
+     * @return string
+     */
+    protected function _saveToRedis($xhprof_data)
+    {
+        $redis = create_redis();
+
+        $run_id = uniqid();
+        $redis->lPush(X_KEY_PREFIX . ":run_id", $run_id);
+        $wt = 0;   //请求总耗时
+        $mu = 0;   //总消耗内存
+        if (!empty($xhprof_data['main()']['wt']) && $xhprof_data['main()']['wt'] > 0) {
+            $wt = round($xhprof_data['main()']['wt'] / 1000000, 4);        //1秒=1000毫秒=1000*1000微秒
+            $mu = round($xhprof_data['main()']['mu'] / 1024 / 1024, 4);      //消耗内存 单位mb   1mb=1024kb=1024*1024b(字节)
+        }
+
+        $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : "";
+
+        $row = array(
+            'request_uri' => $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
+            'method'      => $method,
+            'wt'          => $wt,
+            'mu'          => $mu,
+            'create_time' => time(),  //请求时间
+        );
+        $key = X_KEY_PREFIX . ':request_log:' . $run_id;  //请求列表log
+        $redis->set($key, json_encode($row));
+
+        $key = X_KEY_PREFIX . ':xhprof_log:' . $run_id;   //列表存储log
+        $xhprof_data_str = serialize($xhprof_data);
+        $redis->set($key, $xhprof_data_str);
+
+        return $run_id;
+    }
+
+    public function list_runs() {
+        echo "<meta charset='utf-8'>";
         echo "<hr/>Existing runs:\n<ul>\n";
-        $files = glob("{$this->dir}/*.{$this->suffix}");
-//        usort($files, create_function('$a,$b', 'return filemtime($b) - filemtime($a);'));
-        usort($files, function($a, $b){
-            return filemtime($b) - filemtime($a);
-        });
-        foreach ($files as $file) {
-            list($run,$source) = explode('.', basename($file));
-            echo '<li><a href="' . htmlentities($_SERVER['SCRIPT_NAME'])
-                . '?run=' . htmlentities($run) . '&source='
-                . htmlentities($source) . '">'
-                . htmlentities(basename($file)) . "</a><small> "
-                . date("Y-m-d H:i:s", filemtime($file)) . "</small></li>\n";
+        echo '<li><small class="small_filemtime">请求时间</small><small class="small_wt">耗时(s)</small><small class="small_wt">内存(MB)</small><small class="small_log">xhprof日志</small><small class="small_method">Method</small><small>请求url</small></li>';
+
+        //取所有请求数据
+        $redis = create_redis();
+        $run_id_lists = $redis->lrange(X_KEY_PREFIX.':run_id', 0, X_LOG_NUM);
+
+        foreach ($run_id_lists as $run_id) {
+            $res = $redis->get(X_KEY_PREFIX.":request_log:".$run_id);
+            if(!$res) continue;
+
+            $request_arr = json_decode($res, true);
+            if(!is_array($request_arr)) continue;
+
+            //耗时是否标红显示
+            $wtClass = $request_arr['wt'] > X_VIEW_WTRED ? "red" : "";
+
+            echo '<li><small class="small_filemtime">'
+                . date("Y-m-d H:i:s", $request_arr['create_time'])
+                . '</small><small class="small_wt '.$wtClass.'">'.$request_arr['wt'].'</small></small><small class="small_wt">'.$request_arr['mu'].'</small><small class="small_log"><a href="' . htmlentities($_SERVER['SCRIPT_NAME'])
+                . '?run=' . $run_id . '&source=xhprof_foo&requrl='.urlencode($request_arr['request_uri']).'">'
+                . $run_id . "</a></small>"
+                . '<small class="small_method">'.$request_arr['method'].'</small>'
+                . "<small>".$request_arr['request_uri']."</small></li>\n";
         }
         echo "</ul>\n";
     }
-  }
 }

@@ -8,10 +8,13 @@ class Xhprof
 
     public function __construct($config=[])
     {
+        $this->_defineConfig([]);
     }
 
     //页面输出
     public function index(){
+        $this->_init();
+
         $GLOBALS['XHPROF_LIB_ROOT'] = dirname(__FILE__) . '/xhprof_lib';
         require_once $GLOBALS['XHPROF_LIB_ROOT'].'/display/xhprof.php';
 
@@ -73,6 +76,10 @@ class Xhprof
 
     //监听入口
     public function xhprofStart(){
+        $this->_init();
+
+        if(preg_match('/cli/i', php_sapi_name())) return;
+
         xhprof_enable();
 
         register_shutdown_function([$this, 'xhprofStop']);
@@ -86,7 +93,34 @@ class Xhprof
         include_once $XHPROF_ROOT . "/xhprof_lib/utils/xhprof_runs.php";
 
         $xhprof_runs = new \XHProfRuns_Default();
-        $run_id = $xhprof_runs->save_run($xhprof_data, "xhprof_foo");
-        var_dump($run_id);
+        $xhprof_runs->save_run($xhprof_data, "xhprof_foo");
+    }
+
+    protected function _init(){
+        date_default_timezone_set('PRC');
+        extension_loaded("xhprof") || trigger_error('请检查「xhprof」扩展是否安装!', E_USER_ERROR);
+        extension_loaded("redis") || trigger_error('请检查「redis」扩展是否安装!', E_USER_ERROR);
+    }
+
+    // [TODO] 设计为可配置
+    protected function _defineConfig($config){
+        /**************  redis **************/
+        define('X_REDIS_HOST', 'localhost');
+        define('X_REDIS_PORT', 6379);
+        define('X_REDIS_PWD', '');
+        define('X_REDIS_DB', 0);
+        define('X_KEY_PREFIX', 'xhprof');
+
+        /************* 新增日志 *************/
+        define('X_TIME_LIMIT', 0);      //仅记录响应超过多少秒的请求  默认0记录所有
+        define('X_LOG_NUM', 1000);      //仅记录最近的多少次请求(最大值有待观察，看日志、查看响应时间) 默认1000
+
+        /********* 日志列表页面展现 *********/
+        define('X_VIEW_WTRED', 3);      //列表耗时超过多少秒标红 默认3s
+
+        /********* 忽略URL配置 *********/
+        define('X_IGNORE_URL_ARR', [
+            'samples'
+        ]);
     }
 }

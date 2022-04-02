@@ -3,7 +3,7 @@
   "type": "library",
   "description": "XHProf is a function-level hierarchical profiler for PHP",
   "keywords": ["phpxxb", "xhprof"],
-  "license": "Apache-2.0",
+  "license": "MIT",
   "authors": [
     {
       "name": "phpxxb",
