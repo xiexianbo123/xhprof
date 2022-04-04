@@ -1,6 +1,6 @@
 <?php
-//ini_set("display_errors", "On");
-//error_reporting(-1);
+// ini_set("display_errors", "On");
+// error_reporting(-1);
 
 require "../vendor/autoload.php";
 
@@ -16,13 +16,17 @@ function foo() {
         bar($idx);
         $x = strlen("abc");
     }
+    sleep(3);
 }
 
+$config = [
+    'view_wtred' => 4,
+    'ui_dir_url_path' => '/xhprof/src/xhprof/xhprof_html'
+];
+$obj = new \Xhprof\Xhprof($config);
+// echo $obj->xhprofStart();
+// foo();
 
-$obj = new \Xhprof\Xhprof();
-//echo $obj->xhprofStart();
-//foo();
 
-
-//输出页面
+// 输出页面
 $obj->index();

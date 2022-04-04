@@ -27,77 +27,8 @@
 |Xhprof\Xhprof\index() | 页面输出方法，用于展示xhprof搜集到的运行信息 |
 |Xhprof\Xhprof\xhprofStart() | 开启监听方法，用于处理数据的收集、存储、加工等 |
 
-### OssClient初始化
 
-SDK的OSS操作通过OssClient类完成的，下面代码创建一个OssClient对象:
-
-```php
-<?php
-$accessKeyId = "<您从OSS获得的AccessKeyId>"; ;
-$accessKeySecret = "<您从OSS获得的AccessKeySecret>";
-$endpoint = "<您选定的OSS数据中心访问域名，例如oss-cn-hangzhou.aliyuncs.com>";
-try {
-    $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-} catch (OssException $e) {
-    print $e->getMessage();
-}
-```
-
-### 文件操作
-
-文件(又称对象,Object)是OSS中最基本的数据单元，您可以把它简单地理解为文件，用下面代码可以实现一个Object的上传：
-
-```php
-<?php
-$bucket = "<您使用的Bucket名字，注意命名规范>";
-$object = "<您使用的Object名字，注意命名规范>";
-$content = "Hello, OSS!"; // 上传的文件内容
-try {
-    $ossClient->putObject($bucket, $object, $content);
-} catch (OssException $e) {
-    print $e->getMessage();
-}
-```
-
-### 存储空间操作
-
-存储空间(又称Bucket)是一个用户用来管理所存储Object的存储空间,对于用户来说是一个管理Object的单元，所有的Object都必须隶属于某个Bucket。您可以按照下面的代码新建一个Bucket：
-
-```php
-<?php
-$bucket = "<您使用的Bucket名字，注意命名规范>";
-try {
-    $ossClient->createBucket($bucket);
-} catch (OssException $e) {
-    print $e->getMessage();
-}
-```
-
-### 返回结果处理
-
-OssClient提供的接口返回返回数据分为两种：
-
-* Put，Delete类接口，接口返回null，如果没有OssException，即可认为操作成功
-* Get，List类接口，接口返回对应的数据，如果没有OssException，即可认为操作成功，举个例子：
-
-```php
-<?php
-$bucketListInfo = $ossClient->listBuckets();
-$bucketList = $bucketListInfo->getBucketList();
-foreach($bucketList as $bucket) {
-    print($bucket->getLocation() . "\t" . $bucket->getName() . "\t" . $bucket->getCreateDate() . "\n");
-}
-```
-上面代码中的$bucketListInfo的数据类型是 `OSS\Model\BucketListInfo`
-
-
-### 运行Sample程序
-
-1. 修改 `samples/Config.php`， 补充配置信息
-2. 执行 `cd samples/ && php RunAll.php`
-
-### 运行单元测试
-
+### 使用示例--待完善
 1. 执行`composer install`下载依赖的库
 2. 设置环境变量
 
@@ -108,16 +39,26 @@ foreach($bucketList as $bucket) {
 
 3. 执行 `php vendor/bin/phpunit`
 
+
+### 配置参考
+
+    ui_dir_url_path     xhprof_html目录的路径，需配合cp命令
+    redis_host          redis主机(默认：localhost)
+    redis_port          redis端口(默认：6379)
+    redis_pwd           redis端口(默认为空)
+    redis_db            redis数据库(默认：0)
+    key_prefix          redis存储数据的前缀(默认：xhprof)
+    time_limit          请求超过多少秒开始记录(默认：0，记录所有)
+    log_num             保留最近的多少条记录(默认：1000，保留1000条记录)
+    view_wtred          列表页面超过多少秒标红(默认：3，请求耗时超过3秒标红)
+    ignore_url_arr      需忽略不作为统计的请求。
+
+
 ## License
 
 - MIT
 
+
 ## 联系我们
 
-- [阿里云OSS官方网站](http://oss.aliyun.com)
-- [阿里云OSS官方论坛](http://bbs.aliyun.com)
-- [阿里云OSS官方文档中心](http://www.aliyun.com/product/oss#Docs)
-- 阿里云官方技术支持：[提交工单](https://workorder.console.aliyun.com/#/ticket/createIndex)
-
-[releases-page]: https://github.com/aliyun/aliyun-oss-php-sdk/releases
-[phar-composer]: https://github.com/clue/phar-composer
+邮箱：phpxxb@163.com

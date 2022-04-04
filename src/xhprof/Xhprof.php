@@ -8,7 +8,7 @@ class Xhprof
 
     public function __construct($config=[])
     {
-        $this->_defineConfig([]);
+        $this->_defineConfig($config);
     }
 
     //页面输出
@@ -50,9 +50,9 @@ class Xhprof
         echo "<html>";
 
         echo "<head><title>XHProf: Hierarchical Profiler Report</title>";
-        $ui_dir_url_path = '/xhprof/src/xhprof/xhprof_html';
+//        $ui_dir_url_path = '/xhprof/src/xhprof/xhprof_html';
 //        $ui_dir_url_path = '/xhprof/xhprof_html';
-        xhprof_include_js_css($ui_dir_url_path);
+        xhprof_include_js_css(X_UI_DIR_URL_PATH);
         echo "</head>";
 
         echo "<body>";
@@ -102,25 +102,44 @@ class Xhprof
         extension_loaded("redis") || trigger_error('请检查「redis」扩展是否安装!', E_USER_ERROR);
     }
 
-    // [TODO] 设计为可配置
+    // 配置
     protected function _defineConfig($config){
+        /**************  ui_dir_url_path **************/
+        if(!isset($config['ui_dir_url_path']) || empty($config['ui_dir_url_path'])){
+            trigger_error("缺少ui_dir_url_path配置", E_USER_ERROR);
+        }else{
+            define('X_UI_DIR_URL_PATH', $config['ui_dir_url_path']);
+        }
+
+
         /**************  redis **************/
-        define('X_REDIS_HOST', 'localhost');
-        define('X_REDIS_PORT', 6379);
-        define('X_REDIS_PWD', '');
-        define('X_REDIS_DB', 0);
-        define('X_KEY_PREFIX', 'xhprof');
+        $config['redis_host'] = $config['redis_host'] ?? "localhost";
+        $config['redis_port'] = $config['redis_port'] ?? 6379;
+        $config['redis_pwd'] = $config['redis_pwd'] ?? '';
+        $config['redis_db'] = $config['redis_db'] ?? 0;
+        $config['key_prefix'] = $config['key_prefix'] ?? 'xhprof';
+
+        define('X_REDIS_HOST', $config['redis_host']);
+        define('X_REDIS_PORT', $config['redis_port']);
+        define('X_REDIS_PWD', $config['redis_pwd']);
+        define('X_REDIS_DB', $config['redis_db']);
+        define('X_KEY_PREFIX', $config['key_prefix']);
 
         /************* 新增日志 *************/
-        define('X_TIME_LIMIT', 0);      //仅记录响应超过多少秒的请求  默认0记录所有
-        define('X_LOG_NUM', 1000);      //仅记录最近的多少次请求(最大值有待观察，看日志、查看响应时间) 默认1000
+        $config['time_limit'] = $config['time_limit'] ?? 0;
+        $config['log_num'] = $config['log_num'] ?? 1000;
+
+        define('X_TIME_LIMIT', $config['time_limit']);      //仅记录响应超过多少秒的请求  默认0记录所有
+        define('X_LOG_NUM', $config['log_num']);      //仅记录最近的多少次请求(最大值有待观察，看日志、查看响应时间) 默认1000
 
         /********* 日志列表页面展现 *********/
-        define('X_VIEW_WTRED', 3);      //列表耗时超过多少秒标红 默认3s
+        $config['view_wtred'] = $config['view_wtred'] ?? 3;
+
+        define('X_VIEW_WTRED', $config['view_wtred']);      //列表耗时超过多少秒标红 默认3s
 
         /********* 忽略URL配置 *********/
-        define('X_IGNORE_URL_ARR', [
-            'samples'
-        ]);
+        $config['ignore_url_arr'] = $config['ignore_url_arr'] ?? [];
+
+        define('X_IGNORE_URL_ARR', $config['ignore_url_arr']);
     }
 }
