@@ -179,6 +179,7 @@ class XHProfRuns_Default implements iXHProfRuns
             'method'      => $method,
             'wt'          => $wt,
             'mu'          => $mu,
+            'ip'          => getIp(),
             'create_time' => time(),  //请求时间
         );
         $key = X_KEY_PREFIX . ':request_log:' . $run_id;  //请求列表log
@@ -191,7 +192,7 @@ class XHProfRuns_Default implements iXHProfRuns
         return $run_id;
     }
 
-    public function list_runs() {
+    public function list_runs2() {
         echo "<meta charset='utf-8'>";
         echo "<hr/>Existing runs:\n<ul>\n";
         echo '<li><small class="small_filemtime">请求时间</small><small class="small_wt">耗时(s)</small><small class="small_wt">内存(MB)</small><small class="small_log">xhprof日志</small><small class="small_method">Method</small><small>请求url</small></li>';
@@ -219,5 +220,62 @@ class XHProfRuns_Default implements iXHProfRuns
                 . "<small>".$request_arr['request_uri']."</small></li>\n";
         }
         echo "</ul>\n";
+    }
+
+    public function list_runs() {
+        //取所有请求数据
+        $redis = create_redis();
+        $run_id_lists = $redis->lrange(X_KEY_PREFIX.':run_id', 0, X_LOG_NUM);
+
+        $table_html = "";
+        foreach ($run_id_lists as $run_id) {
+            $res = $redis->get(X_KEY_PREFIX.":request_log:".$run_id);
+            if(!$res) continue;
+
+            $request_arr = json_decode($res, true);
+            if(!is_array($request_arr)) continue;
+
+            //耗时是否标红显示
+            $wtClass = $request_arr['wt'] > X_VIEW_WTRED ? "red" : "";
+
+            $tr = '<tr>'
+                . '<td>'.$request_arr['method'].'</td>'
+                . '<td><a href="' . htmlentities($_SERVER['SCRIPT_NAME']). '?all=1&run=' . $run_id . '&source=xhprof_foo&requrl='.urlencode($request_arr['request_uri']).'">'. $request_arr['request_uri'] . "</a></td>"
+                .'<td>'. date("Y-m-d H:i:s", $request_arr['create_time']). '</td>'
+                .'<td class="'.$wtClass.'">'.$request_arr['wt'].'</small></small>'
+                . '<td>'.$request_arr['mu'].'</td>'
+                . '<td>'.$request_arr['ip'].'</td>'
+                . '</tr>';
+            $table_html .= $tr;
+        }
+
+        $str_html=<<<HTML
+<div class="container-fluid" style="width: 90%">
+<div class="row">
+<div class="col-xs-12">
+<!--第二步：添加如下 HTML 代码-->
+<table id="table_id_example" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="40">方法</th>
+            <th>请求地址</th>
+            <th>请求时间</th>
+            <th width="90">运行耗时(s)</th>
+            <th width="100">内存占用(Mb)</th>
+            <th width="100">IP地址</th>
+        </tr>
+    </thead>
+    <tbody>
+        {$table_html}
+    </tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+HTML;
+
+        echo $str_html;
     }
 }

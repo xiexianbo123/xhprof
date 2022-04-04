@@ -63,16 +63,19 @@ p.blue  {
 }
 
 ul.xhprof_actions {
-  float: right;
-  padding-left: 16px;
+  /*float: right;*/
+  /*padding-left: 16px;*/
   list-style-image: none;
   list-style-type: none;
-  margin:10px 10px 10px 3em;
-  position:relative;
+  /*margin:10px auto;*/
+  /*text-align:center;*/
+  /*position:relative;*/
 }
 
 ul.xhprof_actions li {
-  border-bottom:1px solid #D8DFEA;
+  width: 420px;
+  margin:0px auto;
+  /*border-bottom:1px solid #D8DFEA;*/
 }
 
 ul.xhprof_actions li a:hover {

@@ -16,7 +16,7 @@ function foo() {
         bar($idx);
         $x = strlen("abc");
     }
-    sleep(3);
+    // sleep(3);
 }
 
 $config = [

@@ -65,19 +65,24 @@ function xhprof_include_js_css($ui_dir_url_path = null) {
   // style sheets
   echo "<link href='$ui_dir_url_path/css/xhprof.css' rel='stylesheet' ".
     " type='text/css' />";
+    echo "<link href='$ui_dir_url_path/css/bootstrap.css' rel='stylesheet' ".
+        " type='text/css' />";
+    echo "<link href=\"http://cdn.datatables.net/plug-ins/28e7751dbec/integration/bootstrap/3/dataTables.bootstrap.css\" rel='stylesheet' type='text/css' />";
   echo "<link href='$ui_dir_url_path/jquery/jquery.tooltip.css' ".
     " rel='stylesheet' type='text/css' />";
   echo "<link href='$ui_dir_url_path/jquery/jquery.autocomplete.css' ".
     " rel='stylesheet' type='text/css' />";
 
   // javascript
-  echo "<script src='$ui_dir_url_path/jquery/jquery-1.2.6.js'>".
-       "</script>";
-  echo "<script src='$ui_dir_url_path/jquery/jquery.tooltip.js'>".
-       "</script>";
-  echo "<script src='$ui_dir_url_path/jquery/jquery.autocomplete.js'>"
-       ."</script>";
+  echo "<script src='$ui_dir_url_path/jquery/jquery-1.2.6.js'></script>";
+  echo "<script src='$ui_dir_url_path/jquery/jquery.tooltip.js'></script>";
+  echo "<script src='$ui_dir_url_path/jquery/jquery.autocomplete.js'></script>";
   echo "<script src='$ui_dir_url_path/js/xhprof_report.js'></script>";
+
+    echo "<script src='$ui_dir_url_path/jquery/jquery-3.0.0.min.js'></script>";
+    echo "<script src='$ui_dir_url_path/js/bootstrap.min.js'></script>";
+    echo "<script src='http://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js'></script>";
+    echo "<script src='http://cdn.datatables.net/plug-ins/28e7751dbec/integration/bootstrap/3/dataTables.bootstrap.js'></script>";
 }
 
 
@@ -538,23 +543,23 @@ function profiler_report ($url_params,
 
   // lookup function typeahead form
 //  $links [] = '<input class="function_typeahead" '.' type="input" size="40" maxlength="100" />';
-  $links [] = '<input class="function_typeahead" '.' type="input" size="40" maxlength="100" />'
-      .' <button type="button" id="funcSub">提交</button>';
+//  $links [] = '<input class="function_typeahead form-control" '.' type="input" size="40" maxlength="100" /><button type="button" id="funcSub">提交</button>';
+    $links [] = '<div class="input-group" style="width: 400px;"> <input type="text" class="form-control" placeholder="Search for..."> <span class="input-group-btn"> <button class="btn btn-default" type="button">Go!</button> </span> </div>';
 
   echo xhprof_render_actions($links);
 
 
-  echo
-    '<dl class=phprof_report_info>' .
-    '  <dt>' . $diff_text . ' Report</dt>' .
-    '  <dd>' . ($diff_mode ?
-                $run1_txt . '<br><b>vs.</b><br>' . $run2_txt :
-                $run1_txt) .
-    '  </dd>' .
-    '  <dt>Tip</dt>' .
-    '  <dd>Click a function name below to drill down.</dd>' .
-    '</dl>' .
-    '<div style="clear: both; margin: 3em 0em;"></div>';
+//  echo
+//    '<dl class=phprof_report_info>' .
+//    '  <dt>' . $diff_text . ' Report</dt>' .
+//    '  <dd>' . ($diff_mode ?
+//                $run1_txt . '<br><b>vs.</b><br>' . $run2_txt :
+//                $run1_txt) .
+//    '  </dd>' .
+//    '  <dt>Tip</dt>' .
+//    '  <dd>Click a function name below to drill down.</dd>' .
+//    '</dl>' .
+//    '<div style="clear: both; margin: 3em 0em;"></div>';
 
   // data tables
   if (!empty($rep_symbol)) {
@@ -745,10 +750,9 @@ function print_flat_data($url_params, $title, $flat_data, $sort, $run1, $run2, $
                                                                          'all', 1)));
   }
 
-  print("<h3 align=center>$title $display_link</h3><br>");
+//  print("<h3 align=center>$title $display_link</h3><br>");
 
-  print('<table border=1 cellpadding=2 cellspacing=1 width="90%" '
-        .'rules=rows bordercolor="#bdc7d8" align=center>');
+  print('<table class="table table-condensed table-bordered">');
   print('<tr bgcolor="#bdc7d8" align=right>');
 
   foreach ($stats as $stat) {
@@ -807,8 +811,13 @@ function full_report($url_params, $symbol_tab, $sort, $run1, $run2) {
   global $display_calls;
   global $base_path;
 
+  print('<div class="container-fluid" style="width: 90%"> <div class="row"> <div class="col-xs-12">');  //开始
+
   $possible_metrics = xhprof_get_possible_metrics();
 
+//  var_dump('11');die;
+
+    print('<div class="well well-sm">');
   if ($diff_mode) {
 
     $base_url_params = xhprof_array_unset(xhprof_array_unset($url_params,
@@ -854,7 +863,7 @@ function full_report($url_params, $symbol_tab, $sort, $run1, $run2) {
     }
     print('</table>');
 
-    $callgraph_report_title = '[View Regressions/Improvements using Callgraph Diff]';
+//    $callgraph_report_title = '[View Regressions/Improvements using Callgraph Diff]';
 
   } else {
     print("<p><center>\n");
@@ -885,13 +894,14 @@ function full_report($url_params, $symbol_tab, $sort, $run1, $run2) {
     echo "</table>";
     print("</center></p>\n");
 
-    $callgraph_report_title = '[View Full Callgraph]';
+//    $callgraph_report_title = '[View Full Callgraph]';
   }
+    print('</div>');
 
-  print("<center><br><h3>" .
-        xhprof_render_link($callgraph_report_title,
-                    "$base_path/callgraph.php" . "?" . http_build_query($url_params))
-        . "</h3></center>");
+//  print("<center><br><h3>" .
+//        xhprof_render_link($callgraph_report_title,
+//                    "$base_path/callgraph.php" . "?" . http_build_query($url_params))
+//        . "</h3></center>");
 
 
   $flat_data = array();
@@ -931,6 +941,8 @@ function full_report($url_params, $symbol_tab, $sort, $run1, $run2) {
     }
   }
   print_flat_data($url_params, $title, $flat_data, $sort, $run1, $run2, $limit);
+
+  print('</div></div></div>');  //结束
 }
 
 
@@ -1067,6 +1079,7 @@ function symbol_report($url_params,
   global $display_calls;
   global $base_path;
 
+  print('<div class="container-fluid" style="width: 90%"> <div class="row"> <div class="col-xs-12">');  //开始
   $possible_metrics = xhprof_get_possible_metrics();
 
   if ($diff_mode) {
@@ -1160,12 +1173,13 @@ function symbol_report($url_params,
   $callgraph_href = "$base_path/callgraph.php?"
     . http_build_query(xhprof_array_set($url_params, 'func', $rep_symbol));
 
-  print(" <a href='$callgraph_href'>[View Callgraph $diff_text]</a><br>");
+//  print(" <a href='$callgraph_href'>[View Callgraph $diff_text]</a><br>");
 
   print("</center></h4><br>");
 
-  print('<table border=1 cellpadding=2 cellspacing=1 width="90%" '
-        .'rules=rows bordercolor="#bdc7d8" align=center>' . "\n");
+//    print('<table class="table table-condensed table-bordered">');
+  print('<table border=1 cellpadding=2 cellspacing=1 width="100%" '
+        .'rules=rows bordercolor="#bdc7d8" align=center class="table table-condensed">' . "\n");
   print('<tr bgcolor="#bdc7d8" align=right>');
 
   foreach ($pc_stats as $stat) {
@@ -1277,6 +1291,7 @@ function symbol_report($url_params,
   }
 
   print("</table>");
+  print('</div></div></div>');  //结束
 
   // These will be used for pop-up tips/help.
   // Related javascript code is in: xhprof_report.js
@@ -1446,7 +1461,7 @@ function displayXHProfReport($xhprof_runs_impl, $url_params, $source,
                          $run2);
 
   } else {
-    echo "No XHProf runs specified in the URL.";
+//    echo "No XHProf runs specified in the URL.";
     if (method_exists($xhprof_runs_impl, 'list_runs')) {
       $xhprof_runs_impl->list_runs();
     }
