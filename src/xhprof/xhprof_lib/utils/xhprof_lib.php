@@ -1014,3 +1014,18 @@ function getIp()
     }
     return ($ip);
 }
+
+/**
+ * 获取请求详情
+ * @param $run_id
+ */
+function getRequestLog($run_id){
+    $redis = create_redis();
+    $key = X_KEY_PREFIX.":request_log:".$run_id;
+    $info = $redis->get($key);
+    if($info){
+        return json_decode($info, true);
+    }
+
+    return false;
+}

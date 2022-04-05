@@ -243,14 +243,14 @@ $sortable_columns = array("fn" => 1,
 // Textual descriptions for column headers in "single run" mode
 global $descriptions;
 $descriptions = array(
-                      "fn" => "Function Name",
-                      "ct" =>  "Calls",
-                      "Calls%" => "Calls%",
+                      "fn" => "函数/方法名",
+                      "ct" =>  "调用<br>次数",
+                      "Calls%" => "调用<br>次数<br>占比",
 
-                      "wt" => "Incl. Wall Time<br>(microsec)",
-                      "IWall%" => "IWall%",
-                      "excl_wt" => "Excl. Wall Time<br>(microsec)",
-                      "EWall%" => "EWall%",
+                      "wt" => "总耗时<br>(微秒)",
+                      "IWall%" => "总耗时<br>占比",
+                      "excl_wt" => "自身耗时<br>(微秒)",
+                      "EWall%" => "自身耗时<br>占比",
 
                       "ut" => "Incl. User<br>(microsecs)",
                       "IUser%" => "IUser%",
@@ -262,20 +262,20 @@ $descriptions = array(
                       "excl_st" => "Excl. Sys <br>(microsec)",
                       "ESys%" => "ESys%",
 
-                      "cpu" => "Incl. CPU<br>(microsecs)",
-                      "ICpu%" => "ICpu%",
-                      "excl_cpu" => "Excl. CPU<br>(microsec)",
-                      "ECpu%" => "ECPU%",
+                      "cpu" => "总<br>CPU时间<br>(微秒)",
+                      "ICpu%" => "总<br>CPU时间<br>占比",
+                      "excl_cpu" => "自身<br>CPU时间<br>(微秒)",
+                      "ECpu%" => "自身<br>CPU时间<br>占比",
 
-                      "mu" => "Incl.<br>MemUse<br>(bytes)",
-                      "IMUse%" => "IMemUse%",
-                      "excl_mu" => "Excl.<br>MemUse<br>(bytes)",
-                      "EMUse%" => "EMemUse%",
+                      "mu" => "总<br>内存占用<br>(bytes)",
+                      "IMUse%" => "总<br>内存占用<br>占比",
+                      "excl_mu" => "自身<br>内存占用<br>(bytes)",
+                      "EMUse%" => "自身<br>内存占用<br>占比",
 
-                      "pmu" => "Incl.<br> PeakMemUse<br>(bytes)",
-                      "IPMUse%" => "IPeakMemUse%",
-                      "excl_pmu" => "Excl.<br>PeakMemUse<br>(bytes)",
-                      "EPMUse%" => "EPeakMemUse%",
+                      "pmu" => "总<br>内存峰值<br>(bytes)",
+                      "IPMUse%" => "总<br>内存峰值<br>占比",
+                      "excl_pmu" => "自身<br>内存峰值<br>(bytes)",
+                      "EPMUse%" => "自身<br>内存峰值<br>占比",
 
                       "samples" => "Incl. Samples",
                       "ISamples%" => "ISamples%",
@@ -496,9 +496,7 @@ function profiler_report ($url_params,
   $run1_txt = sprintf("<b>Run #%s:</b> %s",
                       $run1, $run1_desc);
 
-  $base_url_params = xhprof_array_unset(xhprof_array_unset($url_params,
-                                                           'symbol'),
-                                        'all');
+  $base_url_params = xhprof_array_unset(xhprof_array_unset($url_params,'symbol'),'all');
 
   $top_link_query_string = "$base_path/?" . http_build_query($base_url_params);
 
@@ -525,8 +523,7 @@ function profiler_report ($url_params,
 
   // set up the action links for operations that can be done on this report
   $links = array();
-  $links [] =  xhprof_render_link("View Top Level $diff_text Report",
-                                 $top_link_query_string);
+//  $links [] =  xhprof_render_link("View11 Top Level $diff_text Report", $top_link_query_string);
 
   if ($diff_mode) {
     $inverted_params = $url_params;
@@ -544,7 +541,7 @@ function profiler_report ($url_params,
   // lookup function typeahead form
 //  $links [] = '<input class="function_typeahead" '.' type="input" size="40" maxlength="100" />';
 //  $links [] = '<input class="function_typeahead form-control" '.' type="input" size="40" maxlength="100" /><button type="button" id="funcSub">提交</button>';
-    $links [] = '<div class="input-group" style="width: 400px;"> <input type="text" class="form-control" placeholder="Search for..."> <span class="input-group-btn"> <button class="btn btn-default" type="button">Go!</button> </span> </div>';
+    $links [] = '<div class="input-group" style="width: 400px;"> <input type="text" class="function_typeahead form-control" placeholder="Search for..."> <span class="input-group-btn"> <button class="btn btn-default" type="button" id="funcSub">Go!</button> </span> </div>';
 
   echo xhprof_render_actions($links);
 
@@ -564,8 +561,10 @@ function profiler_report ($url_params,
   // data tables
   if (!empty($rep_symbol)) {
     if (!isset($symbol_tab[$rep_symbol])) {
-      echo "<hr>Symbol <b>$rep_symbol</b> not found in XHProf run</b><hr>";
-      return;
+        echo '<div class="container-fluid" style="width: 90%"> <div class="row"> <div class="col-xs-12">';  //开始
+        echo "<hr>Symbol <b>$rep_symbol</b> not found in XHProf run</b><hr>";
+        echo '</div></div></div>';
+        return;
     }
 
     /* single function report with parent/child information */
@@ -752,6 +751,7 @@ function print_flat_data($url_params, $title, $flat_data, $sort, $run1, $run2, $
 
 //  print("<h3 align=center>$title $display_link</h3><br>");
 
+    print('<div style="overflow-x: scroll;overflow-y: hidden;">');
   print('<table class="table table-condensed table-bordered">');
   print('<tr bgcolor="#bdc7d8" align=right>');
 
@@ -784,6 +784,7 @@ function print_flat_data($url_params, $title, $flat_data, $sort, $run1, $run2, $
     }
   }
   print("</table>");
+    print("</div>");
 
   // let's print the display all link at the bottom as well...
   if ($display_link) {
@@ -868,28 +869,44 @@ function full_report($url_params, $symbol_tab, $sort, $run1, $run2) {
   } else {
     print("<p><center>\n");
 
-    print('<table cellpadding=2 cellspacing=1 width="30%" '
-          .'bgcolor="#bdc7d8" align=center>' . "\n");
-    echo "<tr>";
-    echo "<th style='text-align:right'>Overall Summary</th>";
-    echo "<th></th>";
-    echo "</tr>";
+    //取信息
+      $request_info = getRequestLog($_GET['run']) ?: [];
+      $request_uri = isset($request_info['request_uri']) ? urldecode($request_info['request_uri']) : "";
+      $method = $request_info['method'] ?? "";
+      $create_time_text = "";
+      if(isset($request_info['create_time']) && !empty($request_info['create_time'])){
+          $create_time_text = date('Y-m-d H:i:s', $request_info['create_time']);
+      }
+      $ip = $request_info['ip'] ?? "";
 
-    foreach ($metrics as $metric) {
+    print('<table cellpadding=2 cellspacing=1 width="100%" '
+          .'bgcolor="#bdc7d8" align=center>' . "\n");
       echo "<tr>";
-      echo "<td style='text-align:right; font-weight:bold'>Total "
-            . str_replace("<br>", " ", stat_description($metric)) . ":</td>";
+      echo "<td style='text-align:center;font-weight:bold;height: 36px;' colspan='8'>{$request_uri}</td>";
+      echo "</tr>";
+
+    echo "<tr>";
+    echo "<td style='text-align:right; font-weight:bold'>请求方法：</td>";
+    echo "<td>{$method}</td>";
+    echo "<td style='text-align:right; font-weight:bold'>请求时间：</td>";
+    echo "<td>{$create_time_text}</td>";
+      echo "<td style='text-align:right; font-weight:bold'>来源IP：</td>";
+      echo "<td>{$ip}</td>";
+
+      if ($display_calls) {
+          echo "<td style='text-align:right; font-weight:bold'>函数/方法调用总次数：</td>";
+          echo "<td>" . number_format($totals['ct']) . "</td>";
+      }
+      echo "</tr>";
+
+      echo "<tr>";
+    foreach ($metrics as $metric) {
+      echo "<td style='text-align:right; font-weight:bold'>"
+            . str_replace("<br>", " ", stat_description($metric)) . "：</td>";
       echo "<td>" . number_format($totals[$metric]) .  " "
            . $possible_metrics[$metric][1] . "</td>";
-      echo "</tr>";
     }
-
-    if ($display_calls) {
-      echo "<tr>";
-      echo "<td style='text-align:right; font-weight:bold'>Number of Function Calls:</td>";
-      echo "<td>" . number_format($totals['ct']) . "</td>";
       echo "</tr>";
-    }
 
     echo "</table>";
     print("</center></p>\n");
@@ -897,6 +914,7 @@ function full_report($url_params, $symbol_tab, $sort, $run1, $run2) {
 //    $callgraph_report_title = '[View Full Callgraph]';
   }
     print('</div>');
+    print('</div></div><div class="row"> <div class="col-xs-12">');
 
 //  print("<center><br><h3>" .
 //        xhprof_render_link($callgraph_report_title,
@@ -912,7 +930,7 @@ function full_report($url_params, $symbol_tab, $sort, $run1, $run2) {
   }
   usort($flat_data, 'sort_cbk');
 
-  print("<br>");
+//  print("<br>");
 
   if (!empty($url_params['all'])) {
     $all = true;
@@ -1079,7 +1097,7 @@ function symbol_report($url_params,
   global $display_calls;
   global $base_path;
 
-  print('<div class="container-fluid" style="width: 90%"> <div class="row"> <div class="col-xs-12">');  //开始
+  print('<div class="container-fluid" style="width: 90%;"> <div class="row"> <div class="col-xs-12">');  //开始
   $possible_metrics = xhprof_get_possible_metrics();
 
   if ($diff_mode) {
@@ -1167,7 +1185,7 @@ function symbol_report($url_params,
     print('</table>');
   }
 
-  print("<br><h4><center>");
+  print("<h4><center>");
   print("Parent/Child $regr_impr report for <b>$rep_symbol</b>");
 
   $callgraph_href = "$base_path/callgraph.php?"
@@ -1175,7 +1193,7 @@ function symbol_report($url_params,
 
 //  print(" <a href='$callgraph_href'>[View Callgraph $diff_text]</a><br>");
 
-  print("</center></h4><br>");
+  print("</center></h4>");
 
 //    print('<table class="table table-condensed table-bordered">');
   print('<table border=1 cellpadding=2 cellspacing=1 width="100%" '
@@ -1412,6 +1430,8 @@ function profiler_diff_report($url_params,
 function displayXHProfReport($xhprof_runs_impl, $url_params, $source,
                              $run, $wts, $symbol, $sort, $run1, $run2) {
 
+    show_nav($url_params);
+
   if ($run) {                              // specific run to display?
 
     // run may be a single run or a comma separate list of runs
@@ -1466,4 +1486,58 @@ function displayXHProfReport($xhprof_runs_impl, $url_params, $source,
       $xhprof_runs_impl->list_runs();
     }
   }
+}
+
+function show_nav($url_params){
+    global $base_path;
+    $base_url_params = xhprof_array_unset($url_params,'symbol');
+    $top_link_query_string = "$base_path/?" . http_build_query($base_url_params);
+//    var_dump($base_path);die;
+//    var_dump($top_link_query_string);die;
+
+    $li_html = "";
+    if(isset($_GET['run']) && isset($_GET['symbol'])){
+        $li_html =<<<HTML
+<li><a href="{$base_path}">首页</a></li>
+<li><a href="{$top_link_query_string}">运行报告</a></li>
+<li class="active"><a >方法详情</a></li>
+HTML;
+    }else if(isset($_GET['run'])){
+        $li_html =<<<HTML
+<li><a href="{$base_path}">首页</a></li>
+<li class="active"><a href="{$top_link_query_string}">运行报告</a></li>
+HTML;
+    }else{
+        $li_html =<<<HTML
+<li class="active"><a href="{$base_path}">首页</a></li>
+HTML;
+    }
+
+    $title_html =<<<HTML
+<nav class="navbar navbar-inverse navbar-static-top">
+	<div class="container" style="width: 90%;">
+		<div class="navbar-header">
+			<button class="navbar-toggle" data-toggle="collapse" data-target="#response">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand">XHProf性能分析</a>
+		</div>
+
+		<!-- 移动端响应式 -->
+		<div class="collapse navbar-collapse" id="response">
+		<ul class="nav navbar-nav navbar-left">
+			{$li_html}
+		</ul>
+
+		<ul class="nav navbar-nav navbar-right">
+			<li><a href="https://github.com/xiexianbo123/xhprof" target="_blank" title="感谢Star支持！比心心！">>>> GitHub</a></li>
+		</ul>
+		</div>
+	</div>
+</nav>
+HTML;
+
+    echo $title_html;
 }

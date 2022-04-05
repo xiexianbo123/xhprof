@@ -49,7 +49,7 @@ class Xhprof
 
         echo "<html>";
 
-        echo "<head><title>XHProf: Hierarchical Profiler Report</title>";
+        echo "<head><title>XHProf性能分析报告</title>";
 //        $ui_dir_url_path = '/xhprof/src/xhprof/xhprof_html';
 //        $ui_dir_url_path = '/xhprof/xhprof_html';
         xhprof_include_js_css(X_UI_DIR_URL_PATH);
@@ -80,7 +80,7 @@ class Xhprof
 
         if(preg_match('/cli/i', php_sapi_name())) return;
 
-        xhprof_enable();
+        xhprof_enable(XHPROF_FLAGS_MEMORY | XHPROF_FLAGS_CPU);
 
         register_shutdown_function([$this, 'xhprofStop']);
     }
