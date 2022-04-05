@@ -67,7 +67,7 @@ function xhprof_include_js_css($ui_dir_url_path = null) {
     " type='text/css' />";
     echo "<link href='$ui_dir_url_path/css/bootstrap.css' rel='stylesheet' ".
         " type='text/css' />";
-    echo "<link href=\"http://cdn.datatables.net/plug-ins/28e7751dbec/integration/bootstrap/3/dataTables.bootstrap.css\" rel='stylesheet' type='text/css' />";
+    echo "<link href='$ui_dir_url_path/css/dataTables.bootstrap.css' rel='stylesheet' type='text/css' />";
   echo "<link href='$ui_dir_url_path/jquery/jquery.tooltip.css' ".
     " rel='stylesheet' type='text/css' />";
   echo "<link href='$ui_dir_url_path/jquery/jquery.autocomplete.css' ".
@@ -81,8 +81,8 @@ function xhprof_include_js_css($ui_dir_url_path = null) {
 
     echo "<script src='$ui_dir_url_path/jquery/jquery-3.0.0.min.js'></script>";
     echo "<script src='$ui_dir_url_path/js/bootstrap.min.js'></script>";
-    echo "<script src='http://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js'></script>";
-    echo "<script src='http://cdn.datatables.net/plug-ins/28e7751dbec/integration/bootstrap/3/dataTables.bootstrap.js'></script>";
+    echo "<script src='$ui_dir_url_path/js/jquery.dataTables.min.js'></script>";
+    echo "<script src='$ui_dir_url_path/js/dataTables.bootstrap.js'></script>";
 }
 
 

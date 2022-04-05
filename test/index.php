@@ -22,6 +22,7 @@ function foo() {
 $config = [
     'view_wtred' => 4,
     'ui_dir_url_path' => '/xhprof/src/xhprof/xhprof_html'
+    // 'ui_dir_url_path' => '/xhprof/test/xhprof_html'
 ];
 $obj = new \Xhprof\Xhprof($config);
 // echo $obj->xhprofStart();
