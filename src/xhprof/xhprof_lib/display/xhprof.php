@@ -541,7 +541,7 @@ function profiler_report ($url_params,
   // lookup function typeahead form
 //  $links [] = '<input class="function_typeahead" '.' type="input" size="40" maxlength="100" />';
 //  $links [] = '<input class="function_typeahead form-control" '.' type="input" size="40" maxlength="100" /><button type="button" id="funcSub">提交</button>';
-    $links [] = '<div class="input-group" style="width: 400px;"> <input type="text" class="function_typeahead form-control" placeholder="Search for..."> <span class="input-group-btn"> <button class="btn btn-default" type="button" id="funcSub">Go!</button> </span> </div>';
+    $links [] = '<div class="input-group" style="width: 400px;"> <input type="text" class="function_typeahead form-control" placeholder="查找 函数/方法名..."> <span class="input-group-btn"> <button class="btn btn-default" type="button" id="funcSub">搜索</button> </span> </div>';
 
   echo xhprof_render_actions($links);
 
