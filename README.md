@@ -57,7 +57,8 @@ Route::get("xhprof", function (){
 });
 ```
 6.浏览器打开地址看效果
-![示例](/doc/demo.jpg)
+
+![示例](./doc/demo.jpg)
 
 
 ### 配置参考
