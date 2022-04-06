@@ -30,11 +30,14 @@
 
 ### 使用示例(laravel框架/TP5框架)
 1.php安装`redis`、`xhprof`扩展
+
 2.执行`composer require phpxxb/xhprof`下载依赖的库
+
 3.拷贝所需样式文件到「公共目录」
 ```
 cp -r ./vendor/phpxxb/xhprof/src/xhprof/xhprof_html  ./public
 ```
+
 4.代码层，Xhprof开启监听，可放基础控制器中
 ```
 public function __construct()
@@ -46,6 +49,7 @@ public function __construct()
     $xhprof->xhprofStart();
 }
 ```
+
 5.定义路由，展示结果页面
 ```
 Route::get("xhprof", function (){
