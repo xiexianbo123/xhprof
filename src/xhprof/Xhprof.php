@@ -108,7 +108,7 @@ class Xhprof
         if(!isset($config['ui_dir_url_path']) || empty($config['ui_dir_url_path'])){
             trigger_error("缺少ui_dir_url_path配置", E_USER_ERROR);
         }else{
-            define('X_UI_DIR_URL_PATH', $config['ui_dir_url_path']);
+            defined('X_UI_DIR_URL_PATH') || define('X_UI_DIR_URL_PATH', $config['ui_dir_url_path']);
         }
 
 
@@ -119,27 +119,27 @@ class Xhprof
         $config['redis_db'] = $config['redis_db'] ?? 0;
         $config['key_prefix'] = $config['key_prefix'] ?? 'xhprof';
 
-        define('X_REDIS_HOST', $config['redis_host']);
-        define('X_REDIS_PORT', $config['redis_port']);
-        define('X_REDIS_PWD', $config['redis_pwd']);
-        define('X_REDIS_DB', $config['redis_db']);
-        define('X_KEY_PREFIX', $config['key_prefix']);
+        defined('X_REDIS_HOST') || define('X_REDIS_HOST', $config['redis_host']);
+        defined('X_REDIS_PORT') || define('X_REDIS_PORT', $config['redis_port']);
+        defined('X_REDIS_PWD') || define('X_REDIS_PWD', $config['redis_pwd']);
+        defined('X_REDIS_DB') || define('X_REDIS_DB', $config['redis_db']);
+        defined('X_KEY_PREFIX') || define('X_KEY_PREFIX', $config['key_prefix']);
 
         /************* 新增日志 *************/
         $config['time_limit'] = $config['time_limit'] ?? 0;
         $config['log_num'] = $config['log_num'] ?? 1000;
 
-        define('X_TIME_LIMIT', $config['time_limit']);      //仅记录响应超过多少秒的请求  默认0记录所有
-        define('X_LOG_NUM', $config['log_num']);      //仅记录最近的多少次请求(最大值有待观察，看日志、查看响应时间) 默认1000
+        defined('X_TIME_LIMIT') || define('X_TIME_LIMIT', $config['time_limit']);      //仅记录响应超过多少秒的请求  默认0记录所有
+        defined('X_LOG_NUM') || define('X_LOG_NUM', $config['log_num']);      //仅记录最近的多少次请求(最大值有待观察，看日志、查看响应时间) 默认1000
 
         /********* 日志列表页面展现 *********/
         $config['view_wtred'] = $config['view_wtred'] ?? 3;
 
-        define('X_VIEW_WTRED', $config['view_wtred']);      //列表耗时超过多少秒标红 默认3s
+        defined('X_VIEW_WTRED') || define('X_VIEW_WTRED', $config['view_wtred']);      //列表耗时超过多少秒标红 默认3s
 
         /********* 忽略URL配置 *********/
         $config['ignore_url_arr'] = $config['ignore_url_arr'] ?? [];
 
-        define('X_IGNORE_URL_ARR', $config['ignore_url_arr']);
+        defined('X_IGNORE_URL_ARR') || define('X_IGNORE_URL_ARR', $config['ignore_url_arr']);
     }
 }

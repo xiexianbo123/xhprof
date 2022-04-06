@@ -43,7 +43,9 @@ require_once $GLOBALS['XHPROF_LIB_ROOT'].'/utils/xhprof_runs.php';
  * Get the base URL path from the SCRIPT_NAME.
  */
 global $base_path;
-$base_path = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+//$base_path = rtrim(dirname($_SERVER['REQUEST_URI']), '/\\');
+$arr = parse_url($_SERVER['REQUEST_URI']);
+$base_path = rtrim($arr['path'], '/\\');
 
 
 /**
@@ -816,8 +818,6 @@ function full_report($url_params, $symbol_tab, $sort, $run1, $run2) {
 
   $possible_metrics = xhprof_get_possible_metrics();
 
-//  var_dump('11');die;
-
     print('<div class="well well-sm">');
   if ($diff_mode) {
 
@@ -1490,10 +1490,9 @@ function displayXHProfReport($xhprof_runs_impl, $url_params, $source,
 
 function show_nav($url_params){
     global $base_path;
+
     $base_url_params = xhprof_array_unset($url_params,'symbol');
     $top_link_query_string = "$base_path/?" . http_build_query($base_url_params);
-//    var_dump($base_path);die;
-//    var_dump($top_link_query_string);die;
 
     $li_html = "";
     if(isset($_GET['run']) && isset($_GET['symbol'])){

@@ -28,16 +28,36 @@
 |Xhprof\Xhprof\xhprofStart() | 开启监听方法，用于处理数据的收集、存储、加工等 |
 
 
-### 使用示例--待完善
-1. 执行`composer install`下载依赖的库
-2. 设置环境变量
-
-        export OSS_ACCESS_KEY_ID=access-key-id
-        export OSS_ACCESS_KEY_SECRET=access-key-secret
-        export OSS_ENDPOINT=endpoint
-        export OSS_BUCKET=bucket-name
-
-3. 执行 `php vendor/bin/phpunit`
+### 使用示例(laravel框架/TP5框架)
+1.php安装`redis`、`xhprof`扩展
+2.执行`composer require phpxxb/xhprof`下载依赖的库
+3.拷贝所需样式文件到「公共目录」
+```
+cp -r ./vendor/phpxxb/xhprof/src/xhprof/xhprof_html  ./public
+```
+4.代码层，Xhprof开启监听，可放基础控制器中
+```
+public function __construct()
+{
+    $config = [
+        'ui_dir_url_path' => '/xhprof_html'
+    ];
+    $xhprof = new \Xhprof\Xhprof($config);
+    $xhprof->xhprofStart();
+}
+```
+5.定义路由，展示结果页面
+```
+Route::get("xhprof", function (){
+    $config = [
+        'ui_dir_url_path' => '/xhprof_html'
+    ];
+    $xhprof = new \Xhprof\Xhprof($config);
+    $xhprof->index();
+});
+```
+6.浏览器打开地址看效果
+![示例](/doc/demo.jpg)
 
 
 ### 配置参考

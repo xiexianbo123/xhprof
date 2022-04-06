@@ -173,24 +173,31 @@ class XHProfRuns_Default implements iXHProfRuns
         }
 
         $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : "";
-
         $row = array(
             'request_uri' => $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
             'method'      => $method,
             'wt'          => $wt,
             'mu'          => $mu,
-            'ip'          => getIp(),
+            'ip'          => xhprof_get_ip(),
             'create_time' => time(),  //请求时间
         );
+
         $key = X_KEY_PREFIX . ':request_log:' . $run_id;  //请求列表log
         $redis->set($key, json_encode($row));
+
+
 
         $key = X_KEY_PREFIX . ':xhprof_log:' . $run_id;   //列表存储log
         $xhprof_data_str = serialize($xhprof_data);
         $redis->set($key, $xhprof_data_str);
 
+
+
+
         return $run_id;
     }
+
+
 
     public function list_runs2() {
         echo "<meta charset='utf-8'>";
@@ -238,9 +245,10 @@ class XHProfRuns_Default implements iXHProfRuns
             //耗时是否标红显示
             $wtClass = $request_arr['wt'] > X_VIEW_WTRED ? "red" : "";
 
+            $arr = parse_url($_SERVER['REQUEST_URI']);
             $tr = '<tr>'
                 . '<td>'.$request_arr['method'].'</td>'
-                . '<td><a href="' . htmlentities($_SERVER['SCRIPT_NAME']). '?all=1&run=' . $run_id . '&source=xhprof_foo&requrl='.urlencode($request_arr['request_uri']).'">'. $request_arr['request_uri'] . "</a></td>"
+                . '<td><a href="' . htmlentities($arr['path']). '?all=1&run=' . $run_id . '&source=xhprof_foo&requrl='.urlencode($request_arr['request_uri']).'">'. $request_arr['request_uri'] . "</a></td>"
                 .'<td>'. date("Y-m-d H:i:s", $request_arr['create_time']). '</td>'
                 .'<td class="'.$wtClass.'">'.$request_arr['wt'].'</small></small>'
                 . '<td>'.$request_arr['mu'].'</td>'
